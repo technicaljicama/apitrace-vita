@@ -31,7 +31,7 @@
 
 #if !defined(_WIN32)
 #include <unistd.h> // for symlink
-#include "dlopen.hpp"
+// #include "dlopen.hpp"
 #endif
 
 
@@ -176,19 +176,29 @@ _getPrivateProcAddress(const char *procName)
 
 static inline void
 logSymbol(const char *name, void *ptr) {
-    if (0) {
+    if (1) {
         if (ptr) {
-            Dl_info info;
-            if (ptr && dladdr(ptr, &info)) {
-                os::log("apitrace: %s -> \"%s\"\n", name, info.dli_fname);
-            }
+       
+                os::log("apitrace: %s\n", name);
+            
         } else {
             os::log("apitrace: %s -> NULL\n", name);
         }
     }
 }
 
+#ifdef __psp2__
+void * _libgl_sym(const char *symbol)
+{
+    void* result;
 
+    result = (void*)eglGetProcAddress(symbol);
+
+    logSymbol(symbol, result);
+
+    return result;
+}
+#else
 /*
  * Lookup a libGL symbol
  */
@@ -238,18 +248,19 @@ void * _libgl_sym(const char *symbol)
 
     return result;
 }
-
+#endif
 
 void *
 _getPublicProcAddress(const char *procName)
 {
+    // printf("getproc\n");
     return _libgl_sym(procName);
 }
 
 void *
 _getPrivateProcAddress(const char *procName)
 {
-    return (void *)_glXGetProcAddressARB((const GLubyte *)procName);
+    return _libgl_sym(procName);
 }
 
 

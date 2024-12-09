@@ -2,18 +2,18 @@ project (Snappy VERSION 1.1.8 LANGUAGES C CXX)
 
 # TODO generate config.h from snappy/cmake/config.h.in
 
-check_include_file ("sys/uio.h" HAVE_SYS_UIO_H)
-if (HAVE_SYS_UIO_H)
+# check_include_file ("sys/uio.h" HAVE_SYS_UIO_H)
+# if (HAVE_SYS_UIO_H)
     set (HAVE_SYS_UIO_H_01 1)
-else ()
+# else ()
     set (HAVE_SYS_UIO_H_01 0)
-endif ()
+# endif ()
 
 configure_file (
     snappy/snappy-stubs-public.h.in
     ${CMAKE_CURRENT_BINARY_DIR}/config/snappy/snappy-stubs-public.h)
 
-add_convenience_library (snappy EXCLUDE_FROM_ALL
+add_library (snappy EXCLUDE_FROM_ALL
     snappy/snappy-internal.h
     snappy/snappy-stubs-internal.h
     snappy/snappy-c.cc
@@ -49,9 +49,9 @@ target_include_directories (snappy PUBLIC
 target_optimize (snappy)
 
 add_library (Snappy::snappy ALIAS snappy)
-
+#[[
 install (
     FILES snappy/COPYING
     DESTINATION ${DOC_INSTALL_DIR}
     RENAME LICENSE-snappy.txt
-)
+)]]

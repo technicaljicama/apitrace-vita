@@ -54,16 +54,16 @@ if (NOT BROTLIDEC_FOUND OR NOT BROTLIENC_FOUND)
     message (STATUS "Using bundled Brotli")
     include_with_scope (brotli.cmake)
 endif ()
-
+#[[
 if (CMAKE_EXECUTABLE_FORMAT STREQUAL "ELF")
     include_with_scope (libbacktrace.cmake)
-endif ()
-
+endif ()]]
+#[[
 # We use non-standard C++ flags, so we can't just use GTest's CMakeLists.txt
 if (NOT GTEST_FOUND)
     message (STATUS "Using bundled GTest")
     include_with_scope (gtest.cmake)
-endif ()
+endif ()]]
 
 if (MSVC)
     add_subdirectory (getopt)

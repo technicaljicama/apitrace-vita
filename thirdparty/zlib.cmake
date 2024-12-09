@@ -1,4 +1,4 @@
-add_convenience_library (z_bundled EXCLUDE_FROM_ALL
+add_library (z_bundled EXCLUDE_FROM_ALL
     zlib/adler32.c
     zlib/compress.c
     zlib/crc32.c
@@ -29,11 +29,11 @@ else ()
 endif ()
 
 target_optimize (z_bundled)
-
+#[[
 install (
     FILES zlib/README
     DESTINATION ${DOC_INSTALL_DIR}
     RENAME LICENSE-zlib.txt
-)
+)]]
 
 add_library (ZLIB::ZLIB ALIAS z_bundled)

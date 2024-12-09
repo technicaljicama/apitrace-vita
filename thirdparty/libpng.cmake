@@ -3,7 +3,7 @@ configure_file (
     ${CMAKE_CURRENT_BINARY_DIR}/libpng/pnglibconf.h
     COPYONLY)
 
-add_convenience_library (png_bundled EXCLUDE_FROM_ALL
+add_library (png_bundled EXCLUDE_FROM_ALL
     libpng/png.c
     libpng/pngerror.c
     libpng/pngget.c
@@ -32,11 +32,11 @@ if (NOT HAVE_X86)
 endif ()
 
 target_link_libraries (png_bundled PUBLIC ZLIB::ZLIB)
-
+#[[
 install (
     FILES libpng/LICENSE
     DESTINATION ${DOC_INSTALL_DIR}
     RENAME LICENSE-libpng.txt
-)
+)]]
 
 add_library (PNG::PNG ALIAS png_bundled)

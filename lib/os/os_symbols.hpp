@@ -39,7 +39,7 @@
 #ifndef _WIN32
 
 #include <dlfcn.h>
-
+#ifndef __psp2__
 inline std::string
 getModuleFromAddress(void *address)
 {
@@ -49,6 +49,6 @@ getModuleFromAddress(void *address)
     }
     return "";
 }
-
+#endif
 #endif
 

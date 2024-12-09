@@ -6,7 +6,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set (BROTLI_OS "DOS_MACOSX")
 endif ()
 
-add_convenience_library(brotli_common STATIC EXCLUDE_FROM_ALL
+add_library(brotli_common STATIC EXCLUDE_FROM_ALL
     brotli/c/common/constants.c
     brotli/c/common/context.c
     brotli/c/common/dictionary.c
@@ -19,14 +19,14 @@ target_include_directories (brotli_common PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/brotli/c/include
 )
 
-add_convenience_library (brotli_dec STATIC EXCLUDE_FROM_ALL
+add_library (brotli_dec STATIC EXCLUDE_FROM_ALL
     brotli/c/dec/bit_reader.c
     brotli/c/dec/decode.c
     brotli/c/dec/huffman.c
     brotli/c/dec/state.c
 )
 
-add_convenience_library (brotli_enc STATIC EXCLUDE_FROM_ALL
+add_library (brotli_enc STATIC EXCLUDE_FROM_ALL
     brotli/c/enc/backward_references.c
     brotli/c/enc/backward_references_hq.c
     brotli/c/enc/bit_cost.c
@@ -60,12 +60,12 @@ target_link_libraries (brotli_enc PUBLIC brotli_common)
 target_optimize (brotli_common)
 target_optimize (brotli_dec)
 target_optimize (brotli_enc)
-
+#[[
 install (
     FILES brotli/LICENSE
     DESTINATION ${DOC_INSTALL_DIR}
     RENAME LICENSE-brotli.txt
-)
+)]]
 
 if (NOT BROTLIDEC_FOUND)
     add_library (PkgConfig::BROTLIDEC ALIAS brotli_dec)

@@ -77,54 +77,6 @@ getProcessName(void)
 {
     String path;
     size_t size = PATH_MAX;
-    char *buf = path.buf(size);
-
-    // http://stackoverflow.com/questions/1023306/finding-current-executables-path-without-proc-self-exe
-#ifdef __APPLE__
-    uint32_t len = size;
-    if (_NSGetExecutablePath(buf, &len) != 0) {
-        // grow buf and retry
-        buf = path.buf(len);
-        _NSGetExecutablePath(buf, &len);
-    }
-    len = strlen(buf);
-#else
-    ssize_t len;
-
-    len = readlink("/proc/self/exe", buf, size - 1);
-
-    if (len <= 0) {
-        // /proc/self/exe is not available on setuid processes, so fallback to
-        // /proc/self/cmdline.
-        int fd = open("/proc/self/cmdline", O_RDONLY);
-        if (fd >= 0) {
-            // buf already includes trailing zero
-            len = read(fd, buf, size);
-            close(fd);
-            if (len >= 0) {
-                len = strlen(buf);
-            }
-        }
-    }
-
-#ifdef __GLIBC__
-    // fallback to `program_invocation_name`
-    if (len <= 0) {
-        len = strlen(program_invocation_name);
-        buf = path.buf(len + 1);
-        strcpy(buf, program_invocation_name);
-    }
-#endif
-
-    // fallback to process ID
-    if (len <= 0) {
-        len = snprintf(buf, size, "%i", (int)getpid());
-        if (len >= size) {
-            len = size - 1;
-        }
-    }
-#endif
-    path.truncate(len);
 
     return path;
 }
@@ -182,36 +134,7 @@ String
 getConfigDir(void)
 {
     String path;
-
-#ifdef __APPLE__
-    // Library/Preferences
-    const char *homeDir = getenv("HOME");
-    assert(homeDir);
-    if (homeDir) {
-        path = homeDir;
-        path.join("Library/Preferences");
-    }
-#else
-    // http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
-    const char *configHomeDir = getenv("XDG_CONFIG_HOME");
-    if (configHomeDir) {
-        path = configHomeDir;
-    } else {
-        const char *homeDir = getenv("HOME");
-        if (!homeDir) {
-            struct passwd *user = getpwuid(getuid());
-            if (user != NULL) {
-                homeDir = user->pw_dir;
-            }
-        }
-        assert(homeDir);
-        if (homeDir) {
-            path = homeDir;
-            path.join(".config");
-        }
-    }
-#endif
-
+    path = "ux0:apiconf";
     return path;
 }
 
@@ -237,35 +160,37 @@ String::exists(void) const
 
 int execute(char * const * args)
 {
-    pid_t pid = fork();
-    if (pid == 0) {
-        // child
-        execvp(args[0], args);
-        fprintf(stderr, "error: failed to execute:");
-        for (unsigned i = 0; args[i]; ++i) {
-            fprintf(stderr, " %s", args[i]);
-        }
-        fprintf(stderr, "\n");
-        exit(-1);
-    } else {
-        // parent
-        if (pid == -1) {
-            fprintf(stderr, "error: failed to fork\n");
-            return -1;
-        }
-        int status = -1;
-        int ret;
-        waitpid(pid, &status, 0);
-        if (WIFEXITED(status)) {
-            ret = WEXITSTATUS(status);
-        } else if (WIFSIGNALED(status)) {
-            // match shell return code
-            ret = WTERMSIG(status) + 128;
-        } else {
-            ret = 128;
-        }
-        return ret;
-    }
+    printf("execuute %s\n", args);
+    return 0;
+    // pid_t pid = fork();
+    // if (pid == 0) {
+    //     // child
+    //     execvp(args[0], args);
+    //     fprintf(stderr, "error: failed to execute:");
+    //     for (unsigned i = 0; args[i]; ++i) {
+    //         fprintf(stderr, " %s", args[i]);
+    //     }
+    //     fprintf(stderr, "\n");
+    //     exit(-1);
+    // } else {
+    //     // parent
+    //     if (pid == -1) {
+    //         fprintf(stderr, "error: failed to fork\n");
+    //         return -1;
+    //     }
+    //     int status = -1;
+    //     int ret;
+    //     waitpid(pid, &status, 0);
+    //     if (WIFEXITED(status)) {
+    //         ret = WEXITSTATUS(status);
+    //     } else if (WIFSIGNALED(status)) {
+    //         // match shell return code
+    //         ret = WTERMSIG(status) + 128;
+    //     } else {
+    //         ret = 128;
+    //     }
+    //     return ret;
+    // }
 }
 
 static volatile bool logging = false;
@@ -321,7 +246,7 @@ static void (*gCallback)(void) = NULL;
 
 struct sigaction old_actions[NUM_SIGNALS];
 
-
+#ifndef __psp2__
 /*
  * See also:
  * - http://sourceware.org/git/?p=glibc.git;a=blob;f=debug/segfault.c
@@ -431,7 +356,7 @@ setExceptionCallback(void (*callback)(void))
 #endif
     }
 }
-
+#endif
 void
 resetExceptionCallback(void)
 {

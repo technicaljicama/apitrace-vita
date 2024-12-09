@@ -24,7 +24,7 @@ if (CMAKE_C_COMPILER_ID MATCHES Clang)
 endif ()
 
 
-add_convenience_library (mhook
+add_library (mhook
     disasm-lib/cpu.c
     disasm-lib/disasm.c
     disasm-lib/disasm_x86.c

@@ -377,14 +377,14 @@ longOptions[] = {
 static int
 command(int argc, char *argv[])
 {
-    int verbose = 0;
+    int verbose = 1;
     trace::API api = trace::API_GL;
     const char *output = NULL;
     bool debug = false;
     bool mhook = false;
     bool timestamp = false;
-
-    int opt;
+    output = "ux0:gpu.trace";
+    int opt;/*
     while ((opt = getopt_long(argc, argv, shortOptions, longOptions, NULL)) != -1) {
         switch (opt) {
         case 'h':
@@ -438,15 +438,15 @@ command(int argc, char *argv[])
             usage();
             return 1;
         }
-    }
-
+    }*/
+/*
     if (optind == argc) {
         std::cerr << "error: no command specified\n";
         usage();
         return 1;
     }
 
-    assert(argv[argc] == 0);
+    assert(argv[argc] == 0);*/
     return traceProgram(api, argv + optind, output, verbose, debug, mhook, timestamp);
 }
 

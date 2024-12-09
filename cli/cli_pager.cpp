@@ -63,12 +63,12 @@ static pid_t pid = -1;
  */
 static void
 on_exit(void)
-{
+{/*
     fflush(stdout);
     fflush(stderr);
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
-    waitpid(pid, NULL, 0);
+    waitpid(pid, NULL, 0);*/
 }
 
 
@@ -79,9 +79,6 @@ static void
 on_signal(int sig)
 {
     fprintf(stderr, "on_signal\n");
-    on_exit();
-    signal(sig, SIG_DFL); 
-    raise(sig);
 }
 
 
@@ -90,73 +87,7 @@ on_signal(int sig)
  */
 void
 pipepager(void) {
-    if (!isatty(STDOUT_FILENO)) {
-        return;
-    }
 
-    union {
-        int pipe[2];
-        struct {
-            int read;
-            int write;
-        };
-    } fd;
-
-    int ret;
-    const char *pager;
-
-    ret = pipe(fd.pipe);
-    assert(ret == 0);
-    if (ret != 0) {
-        return;
-    }
-
-    pid = fork();
-    switch (pid) {
-    case -1:
-        // failed to fork
-        close(fd.read);
-        close(fd.write);
-        return;
-
-    case 0:
-        // child
-        close(fd.write);
-
-        dup2(fd.read, STDIN_FILENO);
-
-        pager = getenv("PAGER");
-        if (!pager) {
-            pager = "less";
-        }
-
-        if (!getenv("PAGER")) {
-            putenv((char *)"LESS=FRXn");
-        }
-
-        execlp(pager, pager, NULL);
-
-        // This line should never be reached
-        abort();
-
-    default:
-        // parent
-        close(fd.read);
-
-        dup2(fd.write, STDOUT_FILENO);
-        if (isatty(STDERR_FILENO)) {
-            dup2(fd.write, STDERR_FILENO);
-        }
-        close(fd.write);
-
-        // Ensure we wait for the pager before terminating
-        signal(SIGINT, on_signal);
-        signal(SIGHUP, on_signal);
-        signal(SIGTERM, on_signal);
-        signal(SIGQUIT, on_signal);
-        signal(SIGPIPE, on_signal);
-        atexit(on_exit);
-    }
 }
 
 

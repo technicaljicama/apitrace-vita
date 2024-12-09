@@ -48,7 +48,7 @@ static char g_processName[4097];
 
 extern "C"  {
 
-
+#ifndef __psp2__
 PUBLIC ssize_t
 readlink(const char *pathname, char *buf, size_t bufsiz)
 {
@@ -89,7 +89,7 @@ readlink(const char *pathname, char *buf, size_t bufsiz)
 
 } /* extern C */
 
-
+#endif
 void
 setProcessName(const char *processName)
 {

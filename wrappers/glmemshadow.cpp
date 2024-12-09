@@ -36,7 +36,7 @@
 
 #include <unistd.h>
 #include <signal.h>
-#include <sys/mman.h>
+// #include <sys/mman.h>
 
 #endif
 
@@ -57,9 +57,9 @@ enum class MemProtection {
     READ_ONLY = PAGE_READONLY,
     READ_WRITE = PAGE_READWRITE,
 #else
-    NO_ACCESS = PROT_NONE,
-    READ_ONLY = PROT_READ,
-    READ_WRITE = PROT_READ | PROT_WRITE,
+    NO_ACCESS = 1,
+    READ_ONLY = 2,
+    READ_WRITE = 2 | 3,
 #endif
 };
 
@@ -69,7 +69,7 @@ size_t getSystemPageSize() {
     GetSystemInfo(&info);
     return info.dwPageSize;
 #else
-    return sysconf(_SC_PAGESIZE);
+    return 4096;//sysconf(_SC_PAGESIZE);
 #endif
 }
 
@@ -82,13 +82,13 @@ void memProtect(void *addr, size_t size, MemProtection protection) {
         os::log("apitrace: error: VirtualProtect failed with error 0x%lx\n", dwLastError);
         os::abort();
     }
-#else
+#else/*
     const int err = mprotect(addr, size, static_cast<int>(protection));
     if (err) {
         const char *errorStr = strerror(err);
         os::log("apitrace: error: mprotect failed with error \"%s\"\n", errorStr);
         os::abort();
-    }
+    }*/
 #endif
 }
 
@@ -125,7 +125,7 @@ VectoredHandler(PEXCEPTION_POINTERS pExceptionInfo)
 }
 
 #else
-
+#ifndef __psp2__
 static struct sigaction sPrevSigAction;
 
 void PageGuardExceptionHandler(int sig, siginfo_t *si, void *context) {
@@ -157,7 +157,7 @@ void PageGuardExceptionHandler(int sig, siginfo_t *si, void *context) {
     }
 }
 #endif
-
+#endif
 void initializeGlobals()
 {
     sPageSize = getSystemPageSize();
@@ -167,13 +167,7 @@ void initializeGlobals()
         os::log("apitrace: error: %s: add vectored exception handler failed\n", __FUNCTION__);
     }
 #else
-    struct sigaction sa;
-    sa.sa_flags = SA_SIGINFO;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_sigaction = PageGuardExceptionHandler;
-    if (sigaction(SIGSEGV, &sa, &sPrevSigAction) == -1) {
-        os::log("apitrace: error: %s: set page guard exception handler failed\n", __FUNCTION__);
-    }
+
 #endif
 }
 
@@ -189,7 +183,7 @@ GLMemoryShadow::~GLMemoryShadow()
 #ifdef _WIN32
     VirtualFree(shadowMemory, nPages * sPageSize, MEM_RELEASE);
 #else
-    munmap(shadowMemory, nPages * sPageSize);
+    free(shadowMemory);
 #endif
 }
 
@@ -206,7 +200,7 @@ bool GLMemoryShadow::init(const void *data, size_t size)
 #ifdef _WIN32
     shadowMemory = reinterpret_cast<uint8_t*>(VirtualAlloc(nullptr, adjustedSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
 #else
-    shadowMemory = reinterpret_cast<uint8_t*>(mmap(nullptr, adjustedSize, PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
+    shadowMemory = reinterpret_cast<uint8_t*>(malloc(adjustedSize));
 #endif
 
     if (!shadowMemory) {

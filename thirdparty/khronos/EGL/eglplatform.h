@@ -108,6 +108,67 @@ typedef struct ANativeWindow*           EGLNativeWindowType;
 typedef intptr_t EGLNativeDisplayType;
 typedef intptr_t EGLNativePixmapType;
 typedef intptr_t EGLNativeWindowType;
+#elif (defined(__psp2__) || defined(__vita__))
+
+typedef enum Psp2DrawableType
+{
+	PSP2_DRAWABLE_TYPE_UNKNOWN,
+	PSP2_DRAWABLE_TYPE_WINDOW,
+	PSP2_DRAWABLE_TYPE_PIXMAP
+} Psp2DrawableType;
+
+typedef enum Psp2WindowSize
+{
+	PSP2_WINDOW_960X544,
+	PSP2_WINDOW_480X272,
+	PSP2_WINDOW_640X368,
+	PSP2_WINDOW_720X408,
+	PSP2_WINDOW_1280X725,
+	PSP2_WINDOW_1920X1088
+} Psp2WindowSize;
+typedef enum VitaEGLNativeWindow {
+    VITA_INVALID_WINDOW = 0,
+    VITA_WINDOW_960X544,
+    VITA_WINDOW_720X408,
+    VITA_WINDOW_640X368,
+    VITA_WINDOW_480X272,
+    VITA_WINDOW_1280X720,
+    VITA_WINDOW_1920X1080
+} woew;
+typedef struct Psp2NativeWindow
+{
+	unsigned int type;
+	unsigned int windowSize;
+	unsigned int numFlipBuffers;
+	unsigned int flipChainThrdAffinity;
+
+	unsigned int swapChainId;
+	void *swapChain;
+	void *psConnection;
+	unsigned int ahSwapChainBuffers[4]; //PSP2_SWAPCHAIN_MAX_BUFFER_NUM
+	void *apsSwapBufferMemInfo[4]; //PSP2_SWAPCHAIN_MAX_BUFFER_NUM
+	void *psDevData;
+	unsigned int hDevMemContext;
+	unsigned int currBufIdx;
+	unsigned int swapInterval;
+} Psp2NativeWindow;
+
+typedef struct Psp2NativePixmap
+{
+	Psp2DrawableType type;
+	unsigned int sizeX;
+	unsigned int sizeY;
+	unsigned int memType;
+
+	int memUID;
+	void *memBase;
+	void *psDevData;
+	unsigned int hDevMemContext;
+} Psp2NativePixmap;
+
+typedef int	EGLNativeDisplayType;
+typedef Psp2NativeWindow *EGLNativeWindowType;
+typedef Psp2NativePixmap *EGLNativePixmapType;
 
 #elif defined(USE_X11)
 

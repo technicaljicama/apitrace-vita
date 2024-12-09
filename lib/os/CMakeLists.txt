@@ -19,7 +19,7 @@ endif ()
 target_link_libraries (os PUBLIC Threads::Threads)
 
 if (CMAKE_EXECUTABLE_FORMAT STREQUAL "ELF")
-    target_compile_definitions (os PRIVATE HAVE_BACKTRACE=1)
+    target_compile_definitions (os PRIVATE HAVE_BACKTRACE=0)
     target_link_libraries (os PUBLIC backtrace)
 endif ()
 

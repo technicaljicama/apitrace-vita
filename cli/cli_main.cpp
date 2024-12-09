@@ -197,7 +197,10 @@ main(int argc, char **argv)
     const Command *command;
     const Alias *alias;
     int i;
-
+    
+    // argc = 5;
+    // argv
+    
     for (i = 1; i < argc; ++i) {
         const char *arg = argv[i];
 
@@ -219,7 +222,7 @@ main(int argc, char **argv)
         return 1;
     }
 
-    command_name = argv[i];
+    command_name = "trace";//argv[i];
 
     argc -= i;
     argv = &argv[i];

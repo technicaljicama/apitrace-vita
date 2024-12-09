@@ -76,7 +76,7 @@ LocalWriter::LocalWriter() :
 
     // Install the signal handlers as early as possible, to prevent
     // interfering with the application's signal handling.
-    os::setExceptionCallback(exceptionCallback);
+    // os::setExceptionCallback(exceptionCallback);
 }
 
 static void FlushLocalWriterThread(const std::weak_ptr<LocalWriter*> writerWeakPtr,
@@ -117,7 +117,7 @@ LocalWriter::open(void) {
         strftime(suffix, sizeof(suffix), ".%Y%m%dT%H%M%S", std::localtime(&time));
     }
 
-    lpFileName = getenv("TRACE_FILE");
+    lpFileName = "ux0:gpu.trace";//getenv("TRACE_FILE");
     if (!lpFileName) {
         static unsigned dwCounter = 0;
 

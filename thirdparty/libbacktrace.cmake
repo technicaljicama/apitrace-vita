@@ -137,7 +137,7 @@ configure_file (libbacktrace/backtrace-supported.h.in support/libbacktrace/backt
 
 configure_file (support/libbacktrace/config.h.in support/libbacktrace/config.h)
 
-add_convenience_library (backtrace EXCLUDE_FROM_ALL
+add_library (backtrace EXCLUDE_FROM_ALL
     ${BACKTRACE_FILE}
     ${FORMAT_FILE}
     ${VIEW_FILE}
